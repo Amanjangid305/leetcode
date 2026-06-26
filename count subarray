@@ -1,0 +1,38 @@
+#include <vector>
+
+class Solution {
+public:
+    long long countMajoritySubarrays(std::vector<int>& nums, int target) {
+        int n = nums.size();
+        
+        // The maximum range of prefix sums is from -n to +n.
+        // We use an array of size 2 * n + 2 with an offset of n + 1 to prevent negative indices.
+        std::vector<long long> count(2 * n + 2, 0);
+        std::vector<long long> accumulated_prefix(2 * n + 2, 0);
+        
+        int current_sum = n + 1; // Initial index representing prefix sum P_0 = 0
+        
+        // Base case: There is 1 prefix sum at the starting index
+        count[current_sum] = 1;
+        accumulated_prefix[current_sum] = 1;
+        
+        long long totalSubarrays = 0;
+        
+        for (int num : nums) {
+            // Update the prefix sum position
+            current_sum += (num == target) ? 1 : -1;
+            
+            // Increment the frequency count of the new prefix sum reached
+            count[current_sum]++;
+            
+            // Maintain the accumulated prefix sums to know how many previous sums 
+            // are strictly less than the current prefix sum
+            accumulated_prefix[current_sum] = accumulated_prefix[current_sum - 1] + count[current_sum];
+            
+            // Any previous prefix sum that is strictly less than 'current_sum' is valid
+            totalSubarrays += accumulated_prefix[current_sum - 1];
+        }
+        
+        return totalSubarrays;
+    }
+};
